@@ -47,7 +47,7 @@ def save_sgrams(datapath, json_path, num_segments=5):
         for s in range(num_segments):
             start_sample = s * num_samples_per_segment
             finish_sample = start_sample + num_samples_per_segment
-            mel_sgram = calculate_sgram(data[start_sample:finish_sample], sr).T
+            mel_sgram = calculate_sgram(data[start_sample:finish_sample], sr)
             data_dict['sgram'].append(mel_sgram.tolist())
 
     # write dictionary into a json file
