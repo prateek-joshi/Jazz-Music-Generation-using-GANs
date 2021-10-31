@@ -4,6 +4,8 @@ import librosa.display
 import numpy as np
 import json
 import argparse
+import cv2
+
 
 parser = argparse.ArgumentParser(description='Extract mfcc from audio files.')
 parser.add_argument('--data_path', required=True, help='Path to folder containing the wav files.')
@@ -28,11 +30,17 @@ def calculate_sgram(data, sr):
 
     # use the decibel scale to get the final Mel Spectrogram
     mel_decibel_sgram = librosa.amplitude_to_db(mel_scale_sgram, ref=np.min)
-    # librosa.display.specshow(mel_sgram, sr=sr, x_axis='time', y_axis='mel')
+    # librosa.display.specshow(mel_decibel_sgram, sr=sr, x_axis='time', y_axis='mel')
     # plt.colorbar(format='%+2.0f dB')
     # plt.show()
 
-    return mel_decibel_sgram
+    # Original shape: (128, 431)
+    reshaped = cv2.resize(mel_decibel_sgram,(mel_decibel_sgram.shape[0],mel_decibel_sgram.shape[0]),interpolation=cv2.INTER_AREA)
+    # librosa.display.specshow(reshaped, sr=sr, x_axis='time', y_axis='mel')
+    # plt.colorbar(format='%+2.0f dB')
+    # plt.show()
+
+    return reshaped
 
 def save_sgrams(datapath, json_path, num_segments=5):
     data_dict = { 'sgram': [] }
