@@ -12,7 +12,7 @@ class GAN(keras.Model):
         super(GAN, self).compile()
         self.d_optimizer = d_optimizer
         self.g_optimizer = g_optimizer
-        self.loss_fn = loss_fn
+        self.loss_fn = keras.losses.get(loss_fn)
     
     @tf.function
     def train_step(self, data):
