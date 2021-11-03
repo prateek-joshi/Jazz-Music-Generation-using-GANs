@@ -1,5 +1,8 @@
 import tensorflow as tf 
 from tensorflow import keras
+import numpy as np
+tf.config.run_functions_eagerly(True)
+
 
 class GAN(keras.Model):
     def __init__(self, discriminator, generator, latent_dim, **kwargs):
@@ -14,14 +17,14 @@ class GAN(keras.Model):
         self.g_optimizer = g_optimizer
         self.loss_fn = keras.losses.get(loss_fn)
     
-    @tf.function
     def train_step(self, data):
         real_images = data
+        tf.cast(real_images, dtype=tf.float32)
         batch_size = tf.shape(real_images)[0]
-        random_latent_vectors = tf.random.normal(shape=(batch_size, self.latent_dim))   # Gaussian Noise
+        random_latent_vectors = tf.random.normal(shape=(batch_size, self.latent_dim), dtype=tf.float32)   # Gaussian Noise
         
         generated_images = self.generator(random_latent_vectors)
-        combined_images = tf.concat([generated_images, real_images], axis=0)
+        combined_images = tf.concat([generated_images.numpy(), real_images.numpy()], axis=0)
         
         labels = tf.concat([tf.ones((batch_size, 1)),
                             tf.zeros((batch_size, 1))], axis=0)
