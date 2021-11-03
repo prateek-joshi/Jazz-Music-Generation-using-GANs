@@ -16,7 +16,7 @@ class Discriminator(keras.models.Model):
         self.flatten = keras.layers.Flatten(name='Flatten')
         self.dense1 = keras.layers.Dense(128, activation='relu')
         self.dense2 = keras.layers.Dense(64, activation='relu')
-        self.output = keras.layers.Dense(1, activation='sigmoid')
+        self.op = keras.layers.Dense(1, activation='sigmoid')
 
     def call(self, input, training=False):
         x = self.conv1(input)
@@ -35,4 +35,4 @@ class Discriminator(keras.models.Model):
         x = self.dense1(x)
         x = self.dense2(x)
 
-        return self.output(x)
+        return self.op(x)
