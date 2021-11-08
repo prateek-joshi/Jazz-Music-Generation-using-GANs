@@ -10,6 +10,7 @@ import cv2
 parser = argparse.ArgumentParser(description='Extract mfcc from audio files.')
 parser.add_argument('--data_path', required=True, help='Path to folder containing the wav files.')
 parser.add_argument('--json_path', required=True, help='Save path of generated json file.')
+parser.add_argument('--num_segments', required=False, default=5, help='Number of segments of division.')
 arg = parser.parse_args()
 
 DATASET_PATH = arg.data_path
@@ -17,6 +18,7 @@ JSON_PATH = arg.json_path
 SAMPLE_RATE = 22050
 DURATION = 30 # seconds, specific to this dataset
 SAMPLES_PER_TRACK = SAMPLE_RATE * DURATION
+NUM_SEGMENTS = int(arg.num_segments)
 
 
 def calculate_sgram(data, sr):
@@ -30,19 +32,20 @@ def calculate_sgram(data, sr):
 
     # use the decibel scale to get the final Mel Spectrogram
     mel_decibel_sgram = librosa.amplitude_to_db(mel_scale_sgram, ref=np.min)
+    # print('db shape ', mel_decibel_sgram.shape)
     # librosa.display.specshow(mel_decibel_sgram, sr=sr, x_axis='time', y_axis='mel')
     # plt.colorbar(format='%+2.0f dB')
     # plt.show()
 
-    # Original shape: (128, 431)
-    reshaped = cv2.resize(mel_decibel_sgram,(mel_decibel_sgram.shape[0],mel_decibel_sgram.shape[0]),interpolation=cv2.INTER_AREA)
+    reshaped = cv2.resize(mel_decibel_sgram,(mel_decibel_sgram.shape[0]*2,mel_decibel_sgram.shape[0]),interpolation=cv2.INTER_AREA) # Reshape sizes specific to num_segments=5
+    # print('reshaped ', reshaped.shape)
     # librosa.display.specshow(reshaped, sr=sr, x_axis='time', y_axis='mel')
     # plt.colorbar(format='%+2.0f dB')
     # plt.show()
 
     return reshaped
 
-def save_sgrams(datapath, json_path, num_segments=5):
+def save_sgrams(datapath, json_path, num_segments):
     data_dict = { 'sgram': [] }
     num_samples_per_segment = int(SAMPLES_PER_TRACK/num_segments)
 
@@ -67,4 +70,4 @@ if __name__=='__main__':
     # print(os.getcwd())
     # os.chdir('/content')
     # print(os.getcwd())
-    save_sgrams(DATASET_PATH,JSON_PATH,num_segments=3)
+    save_sgrams(DATASET_PATH,JSON_PATH,num_segments=NUM_SEGMENTS)
